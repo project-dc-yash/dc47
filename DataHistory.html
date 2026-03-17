@@ -1,0 +1,206 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AgriTwin | Sensor Data History</title>
+
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+<style>
+
+body{
+font-family:Segoe UI;
+background:#f4f7f6;
+margin:0;
+padding:30px;
+}
+
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:25px;
+}
+
+h1{
+color:#2ecc71;
+}
+
+.back-btn{
+background:#1e272e;
+color:white;
+padding:10px 18px;
+border-radius:6px;
+text-decoration:none;
+}
+
+.table-container{
+background:white;
+border-radius:12px;
+overflow:hidden;
+box-shadow:0 5px 12px rgba(0,0,0,0.05);
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th{
+background:#f8f9fa;
+font-size:12px;
+text-transform:uppercase;
+color:#666;
+padding:15px;
+}
+
+td{
+padding:15px;
+border-bottom:1px solid #eee;
+}
+
+.status-good{
+color:#2ecc71;
+font-weight:bold;
+}
+
+.status-warning{
+color:#e74c3c;
+font-weight:bold;
+}
+
+.refresh{
+margin-top:20px;
+background:#2ecc71;
+color:white;
+border:none;
+padding:12px 18px;
+border-radius:6px;
+cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<h1>Sensor Data History</h1>
+
+<a href="index.html" class="back-btn">
+<i class='bx bx-arrow-back'></i> Dashboard
+</a>
+
+</header>
+
+<div class="table-container">
+
+<table id="historyTable">
+
+<thead>
+
+<tr>
+
+<th>Date</th>
+<th>Temperature</th>
+<th>Humidity</th>
+<th>Soil Moisture</th>
+<th>Gas Level</th>
+<th>Status</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+
+<td>2026-03-15</td>
+<td>24°C</td>
+<td>62%</td>
+<td>41%</td>
+<td>110 ppm</td>
+<td class="status-good">Healthy</td>
+
+</tr>
+
+<tr>
+
+<td>2026-03-14</td>
+<td>25°C</td>
+<td>58%</td>
+<td>28%</td>
+<td>135 ppm</td>
+<td class="status-warning">Low Moisture</td>
+
+</tr>
+
+<tr>
+
+<td>2026-03-13</td>
+<td>23°C</td>
+<td>65%</td>
+<td>44%</td>
+<td>95 ppm</td>
+<td class="status-good">Healthy</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+<button class="refresh" onclick="addNewData()">
+<i class='bx bx-refresh'></i> Generate New Data
+</button>
+
+<script>
+
+function addNewData(){
+
+let temp=(Math.random()*10+20).toFixed(1)
+let hum=Math.floor(Math.random()*40+40)
+let soil=Math.floor(Math.random()*60)
+let gas=Math.floor(Math.random()*200)
+
+let status="Healthy"
+let statusClass="status-good"
+
+if(soil<30){
+status="Low Moisture"
+statusClass="status-warning"
+}
+
+let today=new Date().toISOString().slice(0,10)
+
+let row=`
+<tr>
+
+<td>${today}</td>
+<td>${temp}°C</td>
+<td>${hum}%</td>
+<td>${soil}%</td>
+<td>${gas} ppm</td>
+<td class="${statusClass}">${status}</td>
+
+</tr>
+`
+
+document.querySelector("#historyTable tbody").insertAdjacentHTML("afterbegin",row)
+
+}
+
+</script>
+
+</body>
+</html>
+```

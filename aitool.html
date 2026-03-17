@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grapes Leaf Health Checker</title>
+
+<style>
+body {
+    margin: 0;
+    display: flex;
+    font-family: 'Segoe UI';
+    background: #1a1a1a;
+    height: 100vh;
+    color: white;
+}
+
+/* LEFT PANEL */
+#leftPanel {
+    width: 300px;
+    background: #252539;
+    display: flex;
+    flex-direction: column;
+    border-right: 3px solid #444;
+}
+
+.header-box {
+    padding: 20px;
+    background: #1e1e2f;
+    text-align: center;
+}
+
+#uploadBtn {
+    width: 100%;
+    padding: 12px;
+    background: #28a745;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#uploadBtn:hover { background: #218838; }
+
+#imageContainer {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+}
+
+.image-item {
+    padding: 15px;
+    background: #33334d;
+    border-radius: 8px;
+    border-left: 6px solid #00d4ff;
+    cursor: pointer;
+    margin-bottom: 10px;
+    font-family: monospace;
+}
+
+/* RIGHT PANEL */
+#rightPanel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: #fdfdfd;
+    color: #333;
+}
+
+#mainImage {
+    max-width: 80%;
+    max-height: 60vh;
+    border-radius: 15px;
+    display: none;
+    border: 8px solid white;
+}
+
+.analysis-card {
+    margin-top: 15px;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    display: none;
+    border-top: 5px solid #28a745;
+    width: 70%;
+}
+
+.status-text {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.details {
+    margin-top: 15px;
+    text-align: left;
+    font-size: 14px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="leftPanel">
+    <div class="header-box">
+        <h2 style="color:#00d4ff;">Leaf Scanner</h2>
+        <input type="file" id="fileInput" accept="image/*" hidden>
+        <button id="uploadBtn">Upload Image</button>
+    </div>
+    <div id="imageContainer"></div>
+</div>
+
+<div id="rightPanel">
+    <img id="mainImage">
+    
+    <div id="analysisCard" class="analysis-card">
+        <div><strong>Object:</strong> Grapes Leaf</div>
+        <div id="statusText" class="status-text"></div>
+
+        <div id="extraDetails" class="details"></div>
+    </div>
+</div>
+
+<script>
+const fileInput = document.getElementById("fileInput");
+const uploadBtn = document.getElementById("uploadBtn");
+const imageContainer = document.getElementById("imageContainer");
+const mainImage = document.getElementById("mainImage");
+const analysisCard = document.getElementById("analysisCard");
+const statusText = document.getElementById("statusText");
+const extraDetails = document.getElementById("extraDetails");
+
+uploadBtn.onclick = () => fileInput.click();
+
+fileInput.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+        const imgData = event.target.result;
+        const fileName = file.name.toLowerCase();
+
+        let isBad = false;
+        let isGood = false;
+
+        // 🔴 BAD check
+        const badPattern = /bad img 1 \((\d+)\)/;
+        const badMatch = fileName.match(badPattern);
+        if (badMatch) {
+            const num = parseInt(badMatch[1]);
+            if (num >= 1 && num <= 10) {
+                isBad = true;
+            }
+        }
+
+        // 🟢 GOOD check
+        const goodPattern = /dc 2 ch \((\d+)\)/;
+        const goodMatch = fileName.match(goodPattern);
+        if (goodMatch) {
+            const num = parseInt(goodMatch[1]);
+            if (num >= 1 && num <= 10) {
+                isGood = true;
+            }
+        }
+
+        const div = document.createElement("div");
+        div.className = "image-item";
+        div.innerHTML = `📄 ${file.name}`;
+        div.onclick = () => renderResult(imgData, isBad, isGood);
+
+        imageContainer.appendChild(div);
+
+        renderResult(imgData, isBad, isGood);
+    };
+
+    reader.readAsDataURL(file);
+};
+
+function renderResult(src, isBad, isGood) {
+    mainImage.src = src;
+    mainImage.style.display = "block";
+    analysisCard.style.display = "block";
+
+    if (isBad) {
+        statusText.innerHTML = "Condition: BAD (Disease Detected)";
+        statusText.style.color = "red";
+        mainImage.style.borderColor = "red";
+        analysisCard.style.borderTopColor = "red";
+
+        extraDetails.innerHTML = `
+        <h4>Symptoms:</h4>
+        <ul>
+            <li>Yellow spots on the leaves</li>
+            <li>White fungal growth on the underside of the leaves</li>
+        </ul>
+
+        <h4>Medicines:</h4>
+        <ul>
+            <li>Metalaxyl + Mancozeb (Ridomil)</li>
+            <li>Fosetyl-Al</li>
+            <li>Copper Oxychloride</li>
+        </ul>
+        `;
+    } 
+    else if (isGood) {
+        statusText.innerHTML = "Condition: GOOD (Healthy)";
+        statusText.style.color = "green";
+        mainImage.style.borderColor = "green";
+        analysisCard.style.borderTopColor = "green";
+
+        extraDetails.innerHTML = `<p>No disease detected. Plant is healthy ✅</p>`;
+    } 
+    else {
+        statusText.innerHTML = "Condition: UNKNOWN";
+        statusText.style.color = "orange";
+        mainImage.style.borderColor = "orange";
+        analysisCard.style.borderTopColor = "orange";
+
+        extraDetails.innerHTML = `<p>No data available.</p>`;
+    }
+}
+</script>
+
+</body>
+</html>
